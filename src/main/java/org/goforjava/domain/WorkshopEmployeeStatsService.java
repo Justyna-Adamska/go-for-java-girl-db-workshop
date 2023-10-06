@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class WorkshopEmployeeStatsService implements EmployeeStatsService{
@@ -45,8 +46,15 @@ public class WorkshopEmployeeStatsService implements EmployeeStatsService{
 
     @Override
     public Optional<Department> findDepartmentWithLowestCompensationAverage() {
-        return Optional.empty();
+        final Function<List<Employee>, Double> averageSalaryForEmployees = employees -> employees.stream().collect(Collectors.averagingDouble(Employee::getGrossSalary));
 
+        return employeeDB.findAll().stream()
+                .collect(Collectors.groupingBy(Employee::getDepartmentId))
+                .entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> averageSalaryForEmployees.apply(entry.getValue())))
+                .entrySet().stream()
+                .min(Map.Entry.comparingByValue())
+                .flatMap(entry -> departmentDB.findById(entry.getKey()));
     }
 
     @Override
