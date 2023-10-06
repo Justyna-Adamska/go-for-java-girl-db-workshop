@@ -46,15 +46,15 @@ public class WorkshopEmployeeStatsService implements EmployeeStatsService{
 
     @Override
     public Optional<Department> findDepartmentWithLowestCompensationAverage() {
-        final Function<List<Employee>, Double> averageSalaryForEmployees = employees -> employees.stream().collect(Collectors.averagingDouble(Employee::getGrossSalary));
-
-        return employeeDB.findAll().stream()
-                .collect(Collectors.groupingBy(Employee::getDepartmentId))
-                .entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> averageSalaryForEmployees.apply(entry.getValue())))
-                .entrySet().stream()
-                .min(Map.Entry.comparingByValue())
-                .flatMap(entry -> departmentDB.findById(entry.getKey()));
+        Map<Id, List<Employee>> employeesByDepartment = employeeDB.findAll().stream()
+               .collect(Collectors.groupingBy(Employee::getDepartmentId));
+       Map<Id, Double> averageSalaryByDepartment = employeesByDepartment.entrySet().stream()
+               .collect(Collectors.toMap(Map.Entry::getKey, entry ->
+                       entry.getValue().stream().collect(Collectors.averagingDouble(Employee::getGrossSalary))));
+       Optional<Id> minAverageSalaryDepartmentIdOpt = averageSalaryByDepartment.entrySet().stream()
+               .min(Map.Entry.comparingByValue())
+               .map(Map.Entry::getKey);
+       return minAverageSalaryDepartmentIdOpt.flatMap(departmentDB::findById);
     }
 
     @Override
