@@ -68,7 +68,6 @@ public class EmployeeStatsServiceTest extends EmployeesTest {
         assertTrue(collectedId.contains("e10"));
         assertTrue(collectedId.contains("e11"));
         assertTrue(collectedId.contains("e22"));
-
     }
 
     @Test
