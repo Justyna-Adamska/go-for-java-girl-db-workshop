@@ -4,6 +4,7 @@ import org.goforjava.domain.Employee;
 import org.goforjava.domain.Id;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class EmployeeDB implements DB<Employee> {
 
@@ -11,12 +12,20 @@ public class EmployeeDB implements DB<Employee> {
 
     @Override
     public List<Employee> findAll() {
-        return List.of();
+        return employeeMap.values().stream().collect(Collectors.toList());
     }
 
     @Override
     public Optional<Employee> findById(Id id) {
-        return Optional.empty();
+
+        var employee = employeeMap.get(id);
+
+        if(employee!=null){
+            return Optional.of(employee);
+        }
+        else {
+            return Optional.empty();
+        }
     }
 
     @Override

@@ -2,9 +2,9 @@ package org.goforjava.domain;
 
 import org.goforjava.db.DB;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class WorkshopEmployeeStatsService implements EmployeeStatsService{
 
@@ -18,16 +18,28 @@ public class WorkshopEmployeeStatsService implements EmployeeStatsService{
 
     @Override
     public List<Employee> findEmployeesOlderThen(long years) {
-        return List.of();
+
+        return employeeDB.findAll()
+                .stream()
+                .filter(employee -> LocalDateTime.now().getYear() -employee.getBirthDate().getYear() >= years).collect(Collectors.toList());
     }
 
     @Override
     public List<Employee> findThreeTopCompensatedEmployees() {
-        return List.of();
+
+        return employeeDB
+                .findAll()
+                .stream()
+                .sorted((employee1, employee2) -> employee2.getGrossSalary().compareTo(employee1.getGrossSalary()))
+                .limit(3L)
+                .collect(Collectors.toList());
     }
 
     @Override
     public Optional<Department> findDepartmentWithLowestCompensationAverage() {
+
+
+
         return Optional.empty();
     }
 
